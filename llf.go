@@ -28,6 +28,22 @@ type Rollup struct {
 	handleInspect func(*Emitter, *Inspect)
 }
 
+func NewRollup(
+	handleAdvance func(*Emitter, *Advance),
+	handleInspect func(*Emitter, *Inspect)) (*Rollup, error) {
+
+	binding, err := NewBinding()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Rollup{
+		Emitter:       Emitter{binding},
+		handleAdvance: handleAdvance,
+		handleInspect: handleInspect,
+	}, nil
+}
+
 func (rollup *Rollup) Run(accept bool) {
 	for {
 		finish, err := rollup.binding.Finish(accept)

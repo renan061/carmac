@@ -54,7 +54,7 @@ type Binding struct {
 	rollup *C.cmt_rollup_t
 }
 
-func New() (*Binding, error) {
+func NewBinding() (*Binding, error) {
 	var rollup C.cmt_rollup_t
 	result := C.cmt_rollup_init(&rollup)
 	if err := toError(result, CErrRollupInit); err != nil {
