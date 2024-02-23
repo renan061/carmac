@@ -3,6 +3,8 @@
 
 package llf
 
+import "fmt"
+
 type Emitter struct {
 	binding *Binding
 }
@@ -44,10 +46,12 @@ func NewRollup(
 	}, nil
 }
 
-func (rollup *Rollup) Run(accept bool) {
+func (rollup *Rollup) Run() {
+	accept := true
 	for {
 		finish, err := rollup.binding.Finish(accept)
 		if err != nil {
+			fmt.Println("err")
 			panic(err)
 		}
 

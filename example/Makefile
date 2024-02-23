@@ -5,14 +5,16 @@
 CARTESI_MACHINE=/home/renan/.local/outuni/bin/cartesi-machine
 # CARTESI_MACHINE=cartesi-machine
 
+MAIN=example
+
 all: clean go pack snapshot
 
 go:
 	CC=riscv64-linux-gnu-gcc-12 CGO_ENABLED=1 GOOS=linux GOARCH=riscv64 go build
 	mkdir demo
 	cp entry.sh ./demo
-	cp  ./demo
-	chmod +x ./demo/echo-go
+	cp $(MAIN) ./demo
+	chmod +x ./demo/$(MAIN)
 	chmod +x ./demo/entry.sh
 
 pack:
@@ -42,4 +44,4 @@ clean:
 	rm -rf ./demo
 	rm -f demo.tar
 	rm -f demo.ext2
-	rm -f echo-go
+	rm -f $(MAIN)
