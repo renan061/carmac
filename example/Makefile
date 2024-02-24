@@ -2,20 +2,16 @@
 # Makefile
 #
 
+NAME=dapp
+CC=riscv64-linux-gnu-gcc-12
 CARTESI_MACHINE=/home/renan/.local/outuni/bin/cartesi-machine
 # CARTESI_MACHINE=cartesi-machine
-
-MAIN=example
 
 all: clean go pack snapshot
 
 go:
-	CC=riscv64-linux-gnu-gcc-12 CGO_ENABLED=1 GOOS=linux GOARCH=riscv64 go build
-	mkdir demo
-	cp entry.sh ./demo
-	cp $(MAIN) ./demo
-	chmod +x ./demo/$(MAIN)
-	chmod +x ./demo/entry.sh
+	CC=$(CC) CGO_ENABLED=1 GOOS=linux GOARCH=riscv64 go build -o ./$(NAME)/$(NAME)
+	chmod +x ./$(NAME)/$(NAME)
 
 pack:
 	tar \
@@ -24,24 +20,22 @@ pack:
 		--owner=1000 \
 		--group=1000 \
 		--numeric-owner \
-		-cf demo.tar \
-		--directory=demo .
+		-cf $(NAME).tar \
+		--directory=$(NAME) .
 	genext2fs \
 		-f \
-		-b 8192 \
-		-a demo.tar \
-		demo.ext2
+		-b 16384 \
+		-a $(NAME).tar \
+		$(NAME).ext2
 
 snapshot:
 	$(CARTESI_MACHINE) \
-		--flash-drive=label:demo,filename:demo.ext2 \
+		--flash-drive=label:$(NAME),filename:$(NAME).ext2 \
 	    --assert-rolling-template \
 		--store="snapshot" \
-		-- sh /mnt/demo/entry.sh
+		-- /mnt/$(NAME)/$(NAME)
 
 clean:
 	rm -rf ./snapshot
-	rm -rf ./demo
-	rm -f demo.tar
-	rm -f demo.ext2
-	rm -f $(MAIN)
+	rm -rf ./$(NAME)
+	rm -f $(NAME).*

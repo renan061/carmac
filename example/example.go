@@ -39,35 +39,11 @@ func main() {
 // 	Payload string
 // }
 
-// const server = "http://127.0.0.1:5004"
-//
 // func finish(status string) (*Input, error) {
-// 	finish, err := json.Marshal(map[string]string{"status": status})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	body := bytes.NewBuffer(finish)
-// 	resp, err := http.Post(server+"/finish", "application/json", body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if resp.StatusCode != http.StatusOK {
-// 		panic("resp.Status != http.StatusOk")
-// 	}
-//
-// 	bytes, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-//
 // 	input := Input{}
 // 	err = json.Unmarshal(bytes, &input)
 // 	if err != nil {
 // 		return nil, err
-// 	}
-// 	if input.RequestType != "advance_state" {
-// 		panic("not advance state")
 // 	}
 //
 // 	s, _ := hex.DecodeString(input.Data.Payload[2:])
