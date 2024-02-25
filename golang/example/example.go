@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/renan061/llf/pkg/llf"
+	"github.com/renan061/carmac/carmac"
 )
 
 func advance(emitter *llf.Emitter, advance *llf.Advance) {
