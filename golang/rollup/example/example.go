@@ -3,20 +3,20 @@ package main
 import (
 	"fmt"
 
-	"github.com/renan061/carmac/carmac"
+	"github.com/renan061/carmac/golang/rollup"
 )
 
-func advance(emitter *carmac.Emitter, advance *carmac.Advance) {
+func advance(emitter *rollup.Emitter, advance *rollup.Advance) {
 	fmt.Println("Advance!")
 }
 
-func inspect(emitter *carmac.Emitter, inspect *carmac.Inspect) {
+func inspect(emitter *rollup.Emitter, inspect *rollup.Inspect) {
 	fmt.Println("Inspect!")
 }
 
 func main() {
 	fmt.Println("---------- Started the dapp ----------")
-	rollup, err := carmac.NewRollup(advance, inspect)
+	rollup, err := rollup.NewRollup(advance, inspect)
 	if err != nil {
 		panic(err)
 	}

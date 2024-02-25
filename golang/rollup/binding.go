@@ -1,7 +1,7 @@
 // (c) Cartesi and individual authors (see AUTHORS)
 // SPDX-License-Identifier: Apache-2.0 (see LICENSE)
 
-package carmac
+package rollup
 
 // #cgo CFLAGS: -I/home/renan/.local/outuni/libcmt
 // #cgo LDFLAGS: -L/home/renan/.local/outuni/libcmt -lcmt
