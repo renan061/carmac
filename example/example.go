@@ -15,7 +15,7 @@ func inspect(emitter *llf.Emitter, inspect *llf.Inspect) {
 }
 
 func main() {
-	fmt.Println("---------- Hello ----------")
+	fmt.Println("---------- Started the dapp ----------")
 	rollup, err := llf.NewRollup(advance, inspect)
 	if err != nil {
 		panic(err)

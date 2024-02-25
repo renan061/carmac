@@ -6,10 +6,15 @@ package llf
 // #cgo CFLAGS: -I/home/renan/.local/outuni/libcmt
 // #cgo LDFLAGS: -L/home/renan/.local/outuni/libcmt -lcmt
 // #include <stdlib.h>
+// #include <string.h>
 // #include "rollup.h"
 // #include "io.h"
 import "C"
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"unsafe"
+)
 
 type Finish struct {
 	AcceptPreviousRequest    bool
@@ -85,18 +90,22 @@ func (binding *Binding) Finish(accept bool) (*Finish, error) {
 }
 
 func (binding *Binding) ReadAdvanceState() (*Advance, error) {
+	fmt.Println("---------- 1 ----------")
 	var inner C.cmt_rollup_advance_t
 	result := C.cmt_rollup_read_advance_state(binding.rollup, &inner)
+	fmt.Println("---------- result ----------", result)
 	if err := toError(result, CErrReadAdvanceState); err != nil {
 		return nil, err
 	}
 	defer C.free(inner.data)
 
+	fmt.Println("---------- 2 ----------")
 	var sender [20]byte
 	for i, v := range inner.sender {
 		sender[i] = byte(v)
 	}
 
+	fmt.Println("---------- 3 ----------")
 	return &Advance{
 		Sender:         sender,
 		BlockNumber:    uint64(inner.block_number),
@@ -160,9 +169,13 @@ func (binding *Binding) EmitReport(report []byte) error {
 
 // ------------------------------------------------------------------------------------------------
 
-func toError(n C.int, err error) error {
-	if n != 0 {
-		return err
+func toError(errno C.int, err error) error {
+	if errno != 0 {
+		cs := C.strerror(errno)
+		defer C.free(unsafe.Pointer(cs))
+		s := C.GoString(cs)
+		return errors.New(s)
+		// return err
 	} else {
 		return nil
 	}
