@@ -6,17 +6,17 @@ import (
 	"github.com/renan061/carmac/carmac"
 )
 
-func advance(emitter *llf.Emitter, advance *llf.Advance) {
+func advance(emitter *carmac.Emitter, advance *carmac.Advance) {
 	fmt.Println("Advance!")
 }
 
-func inspect(emitter *llf.Emitter, inspect *llf.Inspect) {
+func inspect(emitter *carmac.Emitter, inspect *carmac.Inspect) {
 	fmt.Println("Inspect!")
 }
 
 func main() {
 	fmt.Println("---------- Started the dapp ----------")
-	rollup, err := llf.NewRollup(advance, inspect)
+	rollup, err := carmac.NewRollup(advance, inspect)
 	if err != nil {
 		panic(err)
 	}
