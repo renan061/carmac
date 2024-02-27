@@ -6,7 +6,7 @@ import (
 	"github.com/renan061/gollup"
 )
 
-func handleAdvance(emitter *rollup.Emitter, input *rollup.Input) {
+func handleAdvance(emitter *gollup.Emitter, input *gollup.Input) {
 	fmt.Println("Advance!")
 	fmt.Println("Received input", input)
 	fmt.Println("Data =", string(input.Data))
@@ -16,13 +16,13 @@ func handleAdvance(emitter *rollup.Emitter, input *rollup.Input) {
 	}
 }
 
-func handleInspect(emitter *rollup.Emitter, query *rollup.Query) {
+func handleInspect(emitter *gollup.Emitter, query *gollup.Query) {
 	fmt.Println("Inspect!")
 }
 
 func main() {
 	fmt.Println("---------- Started the dapp ----------")
-	rollup, err := rollup.NewRollup(handleAdvance, handleInspect)
+	rollup, err := gollup.NewRollup(handleAdvance, handleInspect)
 	if err != nil {
 		panic(err)
 	}
