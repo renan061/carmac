@@ -12,6 +12,7 @@ package gollup
 import "C"
 import (
 	"errors"
+	"fmt"
 	"unsafe"
 )
 
@@ -144,8 +145,14 @@ func (binding *Binding) EmitVoucher(address [20]byte, value []byte, voucher []by
 
 func (binding *Binding) EmitNotice(notice []byte) error {
 	length := C.uint(len(notice))
+
 	data := C.CBytes(notice)
 	defer C.free(data)
+	fmt.Println("data", data)
+	fmt.Println("length", length)
+
+	data = unsafe.Pointer(&notice[0])
+
 	result := C.cmt_rollup_emit_notice(binding.rollup, length, data)
 	return toError(result, CErrEmitNotice)
 }
