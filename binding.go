@@ -12,7 +12,6 @@ package rollup
 import "C"
 import (
 	"errors"
-	"fmt"
 	"unsafe"
 )
 
@@ -22,18 +21,16 @@ type Finish struct {
 	NextRequestPayloadLength uint32
 }
 
-type Advance struct {
+type Input struct {
 	Sender         [20]byte
 	BlockNumber    uint64
 	BlockTimestamp uint64
 	Index          uint64
-	Length         uint32
 	Data           []byte
 }
 
-type Inspect struct {
-	Length uint32
-	Data   []byte
+type Query struct {
+	Data []byte
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -89,34 +86,29 @@ func (binding *Binding) Finish(accept bool) (*Finish, error) {
 	}, nil
 }
 
-func (binding *Binding) ReadAdvanceState() (*Advance, error) {
-	fmt.Println("---------- 1 ----------")
+func (binding *Binding) ReadAdvanceState() (*Input, error) {
 	var inner C.cmt_rollup_advance_t
 	result := C.cmt_rollup_read_advance_state(binding.rollup, &inner)
-	fmt.Println("---------- result ----------", result)
 	if err := toError(result, CErrReadAdvanceState); err != nil {
 		return nil, err
 	}
-	defer C.free(inner.data)
+	// TODO: should I free inner.data
 
-	fmt.Println("---------- 2 ----------")
 	var sender [20]byte
 	for i, v := range inner.sender {
 		sender[i] = byte(v)
 	}
 
-	fmt.Println("---------- 3 ----------")
-	return &Advance{
+	return &Input{
+		Data:           C.GoBytes(inner.data, C.int(inner.length)),
 		Sender:         sender,
 		BlockNumber:    uint64(inner.block_number),
 		BlockTimestamp: uint64(inner.block_timestamp),
 		Index:          uint64(inner.index),
-		Length:         uint32(inner.length),
-		Data:           C.GoBytes(inner.data, C.int(inner.length)),
 	}, nil
 }
 
-func (binding *Binding) ReadInspectState() (*Inspect, error) {
+func (binding *Binding) ReadInspectState() (*Query, error) {
 	var inner C.cmt_rollup_inspect_t
 	result := C.cmt_rollup_read_inspect_state(binding.rollup, &inner)
 	if err := toError(result, CErrReadInspectState); err != nil {
@@ -124,9 +116,8 @@ func (binding *Binding) ReadInspectState() (*Inspect, error) {
 	}
 	defer C.free(inner.data)
 
-	return &Inspect{
-		Length: uint32(inner.length),
-		Data:   C.GoBytes(inner.data, C.int(inner.length)),
+	return &Query{
+		Data: C.GoBytes(inner.data, C.int(inner.length)),
 	}, nil
 }
 

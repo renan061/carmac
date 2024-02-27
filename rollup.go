@@ -3,21 +3,19 @@
 
 package rollup
 
-import "fmt"
-
 type Emitter struct {
 	binding *Binding
 }
 
-func (emitter *Emitter) Voucher(address [20]byte, value []byte, data []byte) error {
+func (emitter *Emitter) EmitVoucher(address [20]byte, value []byte, data []byte) error {
 	return emitter.binding.EmitVoucher(address, value, data)
 }
 
-func (emitter *Emitter) Notice(data []byte) error {
+func (emitter *Emitter) EmitNotice(data []byte) error {
 	return emitter.binding.EmitNotice(data)
 }
 
-func (emitter *Emitter) Report(data []byte) error {
+func (emitter *Emitter) EmitReport(data []byte) error {
 	return emitter.binding.EmitReport(data)
 }
 
@@ -26,13 +24,13 @@ func (emitter *Emitter) Report(data []byte) error {
 type Rollup struct {
 	Emitter
 
-	handleAdvance func(*Emitter, *Advance)
-	handleInspect func(*Emitter, *Inspect)
+	handleAdvance func(*Emitter, *Input)
+	handleInspect func(*Emitter, *Query)
 }
 
 func NewRollup(
-	handleAdvance func(*Emitter, *Advance),
-	handleInspect func(*Emitter, *Inspect)) (*Rollup, error) {
+	handleAdvance func(*Emitter, *Input),
+	handleInspect func(*Emitter, *Query)) (*Rollup, error) {
 
 	binding, err := NewBinding()
 	if err != nil {
@@ -46,28 +44,31 @@ func NewRollup(
 	}, nil
 }
 
+func (rollup *Rollup) Destroy() {
+	rollup.binding.Destroy()
+}
+
 func (rollup *Rollup) Run() {
 	accept := true
 	for {
 		finish, err := rollup.binding.Finish(accept)
 		if err != nil {
-			fmt.Println("err")
 			panic(err)
 		}
 
 		switch finish.NextRequestType {
 		case AdvanceStateRequest:
-			advance, err := rollup.binding.ReadAdvanceState()
+			input, err := rollup.binding.ReadAdvanceState()
 			if err != nil {
 				panic(err)
 			}
-			rollup.handleAdvance(&rollup.Emitter, advance)
+			rollup.handleAdvance(&rollup.Emitter, input)
 		case InspectStateRequest:
-			inspect, err := rollup.binding.ReadInspectState()
+			query, err := rollup.binding.ReadInspectState()
 			if err != nil {
 				panic(err)
 			}
-			rollup.handleInspect(&rollup.Emitter, inspect)
+			rollup.handleInspect(&rollup.Emitter, query)
 		default:
 			panic("unreachable")
 		}

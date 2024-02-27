@@ -30,7 +30,7 @@ snapshot:
 		--flash-drive=label:$(NAME),filename:$(NAME).ext2 \
 	    --assert-rolling-template \
 		--store="snapshot" \
-		-- /mnt/$(NAME)/$(NAME)
+		-- CMT_DEBUG=yes /mnt/$(NAME)/$(NAME)
 
 clean:
 	rm -rf ./snapshot
