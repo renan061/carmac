@@ -5,7 +5,7 @@
 NAME=dapp
 
 CC=riscv64-linux-gnu-gcc-12
-CARTESI_MACHINE=/home/renan/.local/outuni/bin/cartesi-machine
+CARTESI_MACHINE=/home/renan/Local/install/bin/cartesi-machine
 # CARTESI_MACHINE=cartesi-machine
 
 all: clean snapshot

@@ -3,6 +3,11 @@
 
 package gollup
 
+import (
+	"fmt"
+	"log/slog"
+)
+
 type Emitter struct {
 	binding *Binding
 }
@@ -55,15 +60,19 @@ func (rollup *Rollup) Run() {
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println("=================================== finish", finish)
+		fmt.Println("=================================== finish.NextRequestType", finish.NextRequestType)
 
 		switch finish.NextRequestType {
 		case AdvanceStateRequest:
+			slog.Debug("received an advance request")
 			input, err := rollup.binding.ReadAdvanceState()
 			if err != nil {
 				panic(err)
 			}
 			rollup.handleAdvance(&rollup.Emitter, input)
 		case InspectStateRequest:
+			slog.Debug("received an inspect request")
 			query, err := rollup.binding.ReadInspectState()
 			if err != nil {
 				panic(err)

@@ -3,12 +3,12 @@
 
 package gollup
 
-// #cgo CFLAGS: -I/home/renan/.local/outuni/libcmt
-// #cgo LDFLAGS: -L/home/renan/.local/outuni/libcmt -lcmt
+// #cgo CFLAGS: -I/home/renan/Local/install/include
+// #cgo LDFLAGS: -L/home/renan/Local/install/lib -lcmt
 // #include <stdlib.h>
 // #include <string.h>
-// #include "rollup.h"
-// #include "io.h"
+// #include "libcmt/rollup.h"
+// #include "libcmt/io.h"
 import "C"
 import (
 	"errors"
@@ -75,16 +75,22 @@ func (binding *Binding) Finish(accept bool) (*Finish, error) {
 	inner := C.cmt_rollup_finish_t{
 		accept_previous_request: C.bool(accept),
 	}
+
 	result := C.cmt_rollup_finish(binding.rollup, &inner)
 	if err := toError(result, CErrRollupFinish); err != nil {
 		return nil, err
 	}
 
-	return &Finish{
+	fmt.Println("========= accept_previous_request = ", inner.accept_previous_request)
+	fmt.Println("========= next_request_type = ", inner.next_request_type)
+	fmt.Println("========= next_request_payload_length = ", inner.next_request_payload_length)
+
+	finish := &Finish{
 		AcceptPreviousRequest:    bool(inner.accept_previous_request),
-		NextRequestType:          RequestType(inner.next_request_type),
+		NextRequestType:          RequestType(inner.next_request_payload_length), // TODO
 		NextRequestPayloadLength: uint32(inner.next_request_payload_length),
-	}, nil
+	}
+	return finish, nil
 }
 
 func (binding *Binding) ReadAdvanceState() (*Input, error) {
@@ -93,7 +99,7 @@ func (binding *Binding) ReadAdvanceState() (*Input, error) {
 	if err := toError(result, CErrReadAdvanceState); err != nil {
 		return nil, err
 	}
-	// TODO: should I free inner.data
+	// TODO: should I free inner.data?
 
 	var sender [20]byte
 	for i, v := range inner.sender {
@@ -115,7 +121,7 @@ func (binding *Binding) ReadInspectState() (*Query, error) {
 	if err := toError(result, CErrReadInspectState); err != nil {
 		return nil, err
 	}
-	defer C.free(inner.data)
+	// TODO: should I free inner.data?
 
 	return &Query{
 		Data: C.GoBytes(inner.data, C.int(inner.length)),
@@ -151,7 +157,7 @@ func (binding *Binding) EmitNotice(notice []byte) error {
 	fmt.Println("data", data)
 	fmt.Println("length", length)
 
-	data = unsafe.Pointer(&notice[0])
+	data = unsafe.Pointer(&notice[0]) // TODO
 
 	result := C.cmt_rollup_emit_notice(binding.rollup, length, data)
 	return toError(result, CErrEmitNotice)
@@ -161,6 +167,9 @@ func (binding *Binding) EmitReport(report []byte) error {
 	length := C.uint(len(report))
 	data := C.CBytes(report)
 	defer C.free(data)
+
+	data = unsafe.Pointer(&report[0]) // TODO
+
 	result := C.cmt_rollup_emit_report(binding.rollup, length, data)
 	return toError(result, CErrEmitReport)
 }
